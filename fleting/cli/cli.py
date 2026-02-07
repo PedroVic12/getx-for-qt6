@@ -7,9 +7,11 @@ from fleting.cli.commands.delete import handle_delete
 from fleting.cli.commands.list import handle_list
 from fleting.cli.commands.db import handle_db
 from fleting.cli.commands.shell import handle_shell
+from fleting.cli.commands.pull import handle_pull
 
 from fleting.cli.console.console import console
 from fleting.cli.console import Table, Panel, Text, box, Rule
+# import traceback
 
 def print_help():
     console.clear()
@@ -28,7 +30,6 @@ def print_help():
     ))
     console.print()
     
-    # Tabla de comandos
     table = Table(
         show_header=True,
         header_style="bold magenta",
@@ -73,8 +74,15 @@ def print_help():
             ("fleting db make <name>", "Create a new migration"),
             ("fleting db rollback", "Rollback the last migration"),
             ("fleting db status", "Show current database migration status"),
+        ],
+        "🗄️  Database / Models": [
+            ("fleting db model pull", "Generate models from the database schema"),
+            ("fleting db model pull <table>", "Generate model for a specific table"),
+            ("fleting db model pull <table> --force", "Overwrite existing model files"),
+        ],
+        "🧩  Console Command": [
             ("fleting shell", "Open interactive database shell (SQLite only)"),
-        ]
+        ],
     }
     
     for category, commands in categories.items():
@@ -123,12 +131,15 @@ def main():
             handle_db(args[1:])
         elif command == "shell":
             handle_shell()
+        elif command == "pull":
+            handle_pull(args[1:])
         else:
             print(f"Unknown command: {command}")
             print_help()
 
     except Exception as e:
          print("Error executing CLI command:", str(e))
+         # traceback.print_exc() 
 
 if __name__ == "__main__":
     main()

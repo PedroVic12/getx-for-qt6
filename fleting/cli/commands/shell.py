@@ -3,7 +3,22 @@ from pathlib import Path
 from fleting.cli.console.console import console
 import importlib
 import inspect
+import sys
 from rich.table import Table
+
+class FletingPrompt:
+    def __init__(self):
+        self.counter = 0
+
+    def __str__(self):
+        self.counter += 1
+        YELLOW = "\033[33m"
+        GREEN = "\033[32m"
+        RESET = "\033[0m"
+
+        return f"{YELLOW}[{self.counter}] Fleting{GREEN} ❯_ {RESET}"
+
+sys.ps1 = FletingPrompt()
 
 def is_fleting_project(path: Path) -> bool:
     return (path / ".fleting").exists()
@@ -92,6 +107,9 @@ def handle_shell():
         )
         return
     
+    # =========================
+    # Database
+    # =========================
     from configs.database import DATABASE
     engine = DATABASE.get("ENGINE", "sqlite").lower()
     conn = None
@@ -114,7 +132,10 @@ def handle_shell():
             f"[error]❌ Engine '{engine}' not supported by the shell.[/error]"
         )
         return
-        
+    
+    # =========================
+    # Helpers
+    # =========================
     def tables():
         cursor.execute(
             "SELECT name FROM sqlite_master WHERE type='table';"
@@ -142,7 +163,7 @@ def handle_shell():
         rows = cursor.fetchall()
 
         if not rows:
-            console.print("[warning]Empty or non-existent table[/warning]")
+            console.print("[warning]Table exists but has no records[/warning]")
             return
 
         table = Table(title=f"📊 {table_name}")
@@ -155,60 +176,18 @@ def handle_shell():
 
         console.print(table)
     
-    def attach_orm(model, cursor):
-        # regra 1: precisa declarar table
-        if not hasattr(model, "table"):
-            return False
-
-        table = getattr(model, "table")
-
-        # regra 2: tabela precisa existir
-        if not table_exists(cursor, table):
-            return False
-
-        @classmethod
-        def all(cls):
-            cursor.execute(f"SELECT * FROM {table}")
-            return [dict(row) for row in cursor.fetchall()]
-
-        @classmethod
-        def find(cls, id):
-            cursor.execute(
-                f"SELECT * FROM {table} WHERE id = ?", (id,)
-            )
-            row = cursor.fetchone()
-            return dict(row) if row else None
-
-        @classmethod
-        def where(cls, **filters):
-            keys = filters.keys()
-            values = tuple(filters.values())
-            conditions = " AND ".join(f"{k}=?" for k in keys)
-
-            sql = f"SELECT * FROM {table} WHERE {conditions}"
-            cursor.execute(sql, values)
-            return [dict(row) for row in cursor.fetchall()]
-
-        model.all = all
-        model.find = find
-        model.where = where
-
-        return True
-    
-    def models():
-        return list(persistent_models_map.keys())
-    
+    # =========================
+    # Load models (REAL ORM)
+    # =========================
     all_models_map = load_models(project_root)
-    persistent_models_map = {}
 
-    for name, model in all_models_map.items():
-        if attach_orm(model, cursor):
-            persistent_models_map[name] = model
+    def models():
+        return list(all_models_map.keys())
 
     banner = f"""
 [bold cyan]Fleting Console[/bold cyan]
 Project: [green]{project_root.name}[/green]
-Bank: [yellow]{db_path.name}[/yellow]
+Database: [yellow]{db_path.name}[/yellow]
 
 Available helpers:
 • db/conn → SQLite connection
@@ -239,7 +218,7 @@ Use quit() or Ctrl-Z plus Return to exit
         "table": table_view,
     }
 
-    context.update(persistent_models_map)
+    context.update(all_models_map)
 
     try:
         code.interact(banner="", local=context)

@@ -54,3 +54,8 @@ sources/
 fleting.bat
 fleting/cli/helpers/project.py
 fleting/cli/test_console.py
+fleting/flai/*
+fleting/core/*
+flai/
+fleting/OllamaSetup.exe
+requirements.txt

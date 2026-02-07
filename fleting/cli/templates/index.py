@@ -314,7 +314,276 @@ def _connect_mysql():
     # )
 
 """)
+    
+    create_file(BASE / "core/base_model.py", """
+# core/base_model.py
+from core.database import get_connection
+from core.orm import ForeignKey, HasMany
+from typing import Any
 
+class QuerySet:
+
+    def __init__(self, model, relations=None):
+        self.model = model
+        self.relations = relations or []
+    
+    def _cursor(self):
+        conn = get_connection()
+        conn.row_factory = lambda c, r: dict(
+            zip([col[0] for col in c.description], r)
+        )
+        return conn, conn.cursor()
+
+    def all(self):
+        conn, cursor = self._cursor()
+
+        cursor.execute(
+            f"SELECT * FROM {self.model.table_name}"
+        )
+        rows = cursor.fetchall()
+
+        return self._attach_relations(cursor, rows)
+    
+    def first(self):
+        conn, cursor = self._cursor()
+        cursor.execute(
+            f"SELECT * FROM {self.model.table_name} LIMIT 1"
+        )
+        row = cursor.fetchone()
+        if not row:
+            return None
+        return self._attach_relations(cursor, [row])[0]
+
+    def find(self, id):
+        conn, cursor = self._cursor()
+
+        cursor.execute(
+            f"SELECT * FROM {self.model.table_name} WHERE id = ?",
+            (id,)
+        )
+        row = cursor.fetchone()
+
+        if not row:
+            return None
+
+        return self._attach_relations(cursor, [row])[0]
+
+    def where(self, **filters):
+        conn, cursor = self._cursor()
+
+        keys = filters.keys()
+        values = tuple(filters.values())
+        cond = " AND ".join(f"{k}=?" for k in keys)
+
+        cursor.execute(
+            f"SELECT * FROM {self.model.table_name} WHERE {cond}",
+            values
+        )
+
+        rows = cursor.fetchall()
+        return self._attach_relations(cursor, rows)
+    
+    def count(self):
+        conn, cursor = self._cursor()
+        cursor.execute(
+            f"SELECT COUNT(*) as total FROM {self.model.table_name}"
+        )
+        return cursor.fetchone()["total"]
+    
+    def exists(self, **filters):
+        return len(self.where(**filters)) > 0
+    
+    # =========================
+    # Relations
+    # =========================
+
+    def _attach_relations(self, cursor, rows):
+        if not self.relations:
+            return rows
+
+        for row in rows:
+            for rel_name in self.relations:
+                rel = getattr(self.model, rel_name, None)
+
+                if isinstance(rel, ForeignKey):
+                    value = row.get(rel.local)
+                    row[rel_name] = rel.resolve(cursor, value)
+
+                elif isinstance(rel, HasMany):
+                    value = row.get("id")
+                    row[rel_name] = rel.resolve(cursor, value)
+
+        return rows
+
+class BaseModel:
+    table_name: str
+    # ---------- Query ----------
+    @classmethod
+    def with_(cls, *relations):
+        return QuerySet(cls, relations)
+
+    @classmethod
+    def all(cls):
+        return cls.with_().all()
+    
+    @classmethod
+    def first(cls):
+        return cls.with_().first()
+
+    @classmethod
+    def find(cls, id):
+        return cls.with_().find(id)
+
+    @classmethod
+    def where(cls, **filters):
+        return cls.with_().where(**filters)
+    
+    @classmethod
+    def count(cls):
+        return cls.with_().count()
+    
+    @classmethod
+    def exists(cls, **filters):
+        return cls.with_().exists(**filters)
+
+    # ---------- Write ----------
+    @classmethod
+    def create(cls, **data):
+        conn = get_connection()
+        cursor = conn.cursor()
+
+        keys = ", ".join(data.keys())
+        placeholders = ", ".join("?" for _ in data)
+        values = tuple(data.values())
+
+        cursor.execute(
+            f"INSERT INTO {cls.table_name} ({keys}) VALUES ({placeholders})",
+            values
+        )
+        conn.commit()
+
+        return cls.find(cursor.lastrowid)
+
+    def to_dict(self):
+        return {
+            k: v
+            for k, v in self.__dict__.items()
+            if not k.startswith("_")
+        }
+
+    def save(self):
+        data = self.__dict__.copy()
+
+        if "id" in data and data["id"]:
+            self.update(**data)
+        else:
+            obj = self.__class__.create(**data)
+            self.id = obj["id"]
+
+        return self
+
+    def update(self, **data):
+        conn = get_connection()
+        cursor = conn.cursor()
+
+        if "id" not in data:
+            raise ValueError("Update requires id")
+
+        id = data.pop("id")
+        assigns = ", ".join(f"{k}=?" for k in data)
+        values = tuple(data.values()) + (id,)
+
+        cursor.execute(
+            f"UPDATE {self.table_name} SET {assigns} WHERE id = ?",
+            values
+        )
+        conn.commit()
+        return self
+
+    def delete(self):
+        if not getattr(self, "id", None):
+            raise ValueError("Delete requires id")
+
+        conn = get_connection()
+        cursor = conn.cursor()
+
+        cursor.execute(
+            f"DELETE FROM {self.table_name} WHERE id = ?",
+            (self.id,)
+        )
+        conn.commit()
+ """)
+
+    create_file(BASE / "core/orm.py", """
+# core/orm.py
+class ForeignKey:
+    def __init__(self, table: str, local: str, remote: str = "id"):
+        self.table = table
+        self.local = local
+        self.remote = remote
+
+    def resolve(self, cursor, value):
+        cursor.execute(
+            f"SELECT * FROM {self.table} WHERE {self.remote} = ?",
+            (value,)
+        )
+        row = cursor.fetchone()
+        return dict(row) if row else None
+
+    def __repr__(self):
+        return f"<ForeignKey {self.local} → {self.table}.{self.remote}>"
+
+class HasMany:
+    def __init__(self, table: str, foreign_key: str):
+        self.table = table
+        self.foreign_key = foreign_key
+
+    def resolve(self, cursor, value):
+        cursor.execute(
+            f"SELECT * FROM {self.table} WHERE {self.foreign_key} = ?",
+            (value,)
+        )
+        return [dict(r) for r in cursor.fetchall()]
+
+    def __repr__(self):
+        return f"<HasMany {self.table} via {self.foreign_key}>"
+
+ """)
+    
+    create_file(BASE / "core/table_filters.py", """
+DEFAULT_EXCLUDED_TABLES = {
+    "_fleting_migrations",
+    "migrations",
+    "schema_migrations",
+    "alembic_version",
+    "sqlite_sequence",
+    "flyway_schema_history",
+}
+
+def is_internal_table(table_name: str) -> bool:
+
+    return (
+        table_name.startswith("_")
+        or table_name.startswith("sys_")
+        or table_name.startswith("tmp_")
+    )
+
+def should_generate_model(table_name: str, config_excludes=None) -> bool:
+
+    config_excludes = set(config_excludes or [])
+
+    if table_name in DEFAULT_EXCLUDED_TABLES:
+        return False
+
+    if table_name in config_excludes:
+        return False
+
+    if is_internal_table(table_name):
+        return False
+
+    return True
+ """)
+   
     # =========================
     # CONFIGS
     # =========================
@@ -716,16 +985,13 @@ class SettingsView:
 import flet as ft
 from views.layouts.main_layout import MainLayout
 from controllers.help_controller import HelpController
-from models.help_model import HelpModel
 from flet import UrlLauncher
 
 class HelpView:
     def __init__(self, page, router):
         self.page = page
         self.router = router
-
-        self.model = HelpModel()
-        self.controller = HelpController(self.model)
+        self.controller = HelpController()
         self.url_launcher = UrlLauncher()
     
     async def open_docs(self, e):
@@ -848,7 +1114,7 @@ class SettingsController:
     '''
 
     def __init__(self, model=None):
-        self.model = model or SettingsModel()
+        self.model = model or SettingsModel
 
     def get_title(self):
         return "Settings"
@@ -863,7 +1129,7 @@ class HelpController:
     '''
 
     def __init__(self, model=None):
-        self.model = model or HelpModel()
+        self.model = model or HelpModel
 
     def get_title(self):
         return "Help"
@@ -873,15 +1139,17 @@ class HelpController:
     # BASIC models
     # =========================
     create_file(BASE / "models/help_model.py", """
-class HelpModel:
-    def __init__(self):
-        pass
+from core.base_model import BaseModel
+
+class HelpModel(BaseModel):
+    table_name = "help"
 """)
 
     create_file(BASE / "models/settings_model.py", """
-class SettingsModel:
-    def __init__(self):
-        pass
+from core.base_model import BaseModel
+
+class SettingsModel(BaseModel):
+    table_name = "settings"
 """)
 
 if __name__ == "__main__":

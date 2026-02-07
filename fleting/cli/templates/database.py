@@ -38,6 +38,11 @@ def up(db):
             password TEXT
         )
     ''')
+
+def down(db):
+    db.execute('''
+        DROP TABLE IF EXISTS users
+    ''')               
 """)
     print(f"✅ migrations/001_initial.py successfully created")
     
@@ -92,7 +97,7 @@ def rollback_migration(name, down):
     )
     db.commit()
 """)
-
+     
     print("✅ Database structure initialized")
 
 def db_migrate(root: Path):

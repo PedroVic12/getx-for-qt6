@@ -1,5 +1,6 @@
 from pathlib import Path
 from fleting.cli.templates.database import db_init, db_migrate, db_seed, make_migration, db_rollback, db_status
+from fleting.cli.commands.pull import handle_pull
 from fleting.cli.console.console import console
 
 def is_fleting_project(path: Path) -> bool:
@@ -70,6 +71,8 @@ def handle_db(args):
         db_rollback(root)
     elif cmd == "status":
         db_status(root)
+    elif cmd == "model":
+        handle_pull(args[1:])
     else:
         console.print(f"Unknown db command: {cmd}", style="warning")
 

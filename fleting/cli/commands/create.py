@@ -63,7 +63,7 @@ class {class_name}:
     """
 
     def __init__(self, model=None):
-        self.model = model or {model_class}()
+        self.model = model or {model_class}
 
     def get_title(self):
         return "{to_pascal_case(name)}"
@@ -124,9 +124,10 @@ def create_model(name: str):
 
     class_name = f"{name.capitalize()}Model"
 
-    content = f"""class {class_name}:
-    def __init__(self):
-        pass
+    content = f"""from core.base_model import BaseModel
+
+class {class_name}(BaseModel):
+    table_name = "{name}"
 """
 
     path.write_text(content, encoding="utf-8")
