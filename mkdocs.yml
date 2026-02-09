@@ -1,14 +1,13 @@
 site_name: Fleting Docs
-site_url: https://alexyucra.github.io/Fleting/
 use_directory_urls: true
+site_url: https://alexyucra.github.io/Fleting/
 theme:
   name: material
   logo: img/fleting_logo.png
+  icon: img/fleting_logo.png
   language: en
-  features:
-    - navigation.tabs        
+  features:      
     - navigation.sections   
-    - navigation.instant    
     - content.code.copy     
 plugins:
   - search
