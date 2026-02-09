@@ -3,7 +3,14 @@ site_url: https://alexyucra.github.io/Fleting/
 use_directory_urls: true
 theme:
   name: material
+  language: en
+  features:
+    - navigation.tabs        
+    - navigation.sections   
+    - navigation.instant    
+    - content.code.copy     
 plugins:
+  - search
   - i18n:
       languages:
         - locale: en
@@ -30,6 +37,6 @@ nav:
       - Arquitectura: es/arquitectura.md
       - Checklist: es/checklist.md
       - CLI: es/cli.md
-      - Entorno: pt/enviroment.md
+      - Entorno: es/enviroment.md
   - Contribuir: CONTRIBUTING.md
 
