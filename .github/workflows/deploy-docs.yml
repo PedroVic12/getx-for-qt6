@@ -1,0 +1,30 @@
+name: Deploy Documentation
+on:
+  push:
+    branches:
+      - main 
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: |
+          pip install mkdocs mkdocs-material mkdocs-static-i18n
+
+      - name: Build and Deploy to www branch
+        run: |
+          # Esto construye el sitio y lo sube automáticamente a la rama 'www'
+          # El parámetro -b define la rama de destino
+          mkdocs gh-deploy --force --clean --remote-name origin --remote-branch www
+
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
