@@ -1,8 +1,11 @@
-name: Deploy Documentation
+name: Deploy Fleting Docs
 on:
   push:
     branches:
       - main 
+
+permissions:
+  contents: write
 
 jobs:
   deploy:
@@ -10,6 +13,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -20,11 +25,9 @@ jobs:
         run: |
           pip install mkdocs mkdocs-material mkdocs-static-i18n
 
-      - name: Build and Deploy to www branch
+      - name: Build and Deploy
         run: |
-          # Esto construye el sitio y lo sube automáticamente a la rama 'www'
-          # El parámetro -b define la rama de destino
-          mkdocs gh-deploy --force --clean --remote-name origin --remote-branch www
+          mkdocs gh-deploy --force --clean --remote-branch www
 
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

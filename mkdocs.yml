@@ -3,6 +3,7 @@ site_url: https://alexyucra.github.io/Fleting/
 use_directory_urls: true
 theme:
   name: material
+  logo: img/fleting_logo.png
   language: en
   features:
     - navigation.tabs        
