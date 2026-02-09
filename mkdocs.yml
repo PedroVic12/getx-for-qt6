@@ -1,4 +1,6 @@
 site_name: Fleting Docs
+site_url: https://alexyucra.github.io/Fleting/
+use_directory_urls: true
 theme:
   name: material
 plugins:
