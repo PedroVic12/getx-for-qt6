@@ -1,12 +1,15 @@
 <p align="center">
-| <a href="README.md">🇺🇸 English</a> |
-  <a href="docs/readme-pt.md">🇧🇷 Português</a> |
-  <a href="docs/readme-es.md">🇪🇸 Español</a> |
+| <a href="https://alexyucra.github.io/Fleting/">🇺🇸 English</a> |
+  <a href="https://alexyucra.github.io/Fleting/pt/cli/">🇧🇷 Português</a> |
+  <a href="https://alexyucra.github.io/Fleting/es/cli/">🇪🇸 Español</a> |
 </p>
 
 ---
+<p align="center">
+  <img src="../img/fleting_logo.png" width="100"/>
+</p>
 
-#  ![](./docs/img/fleting%20logo.png) Fleting Framework
+# Fleting Framework
 
 Fleting is an opinionated micro-framework built on top of Flet, focused on:
 
