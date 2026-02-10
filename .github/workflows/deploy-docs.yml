@@ -27,7 +27,7 @@ jobs:
 
       - name: Build and Deploy
         run: |
-          mkdocs gh-deploy --force --clean --remote-branch www
+          mkdocs gh-deploy --force --clean
 
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

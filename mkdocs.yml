@@ -4,7 +4,7 @@ site_url: https://alexyucra.github.io/Fleting/
 theme:
   name: material
   logo: img/fleting_logo.png
-  favicon:: img/fleting_logo.png
+  favicon: img/fleting_logo.png
   language: en
   features:      
     - navigation.sections   
