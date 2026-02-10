@@ -1,43 +1,54 @@
-site_name: Fleting Docs V2
-use_directory_urls: true
+site_name: Test Material
 site_url: https://alexyucra.github.io/Fleting/
+
 theme:
   name: material
-  logo: img/fleting_logo.png
-  favicon: img/fleting_logo.png
-  language: en
-  features:      
-    - navigation.sections   
-    - content.code.copy 
-    - navigation.indexes    
-plugins:
-  - search
-  - i18n:
-      languages:
-        - locale: en
-          name: English
-          default: true
-          build: true
-        - locale: pt
-          name: Português
-          build: true
-        - locale: es
-          name: Español
-          build: true
+  features:
+    - navigation.tabs
 
 nav:
   - Home: index.md
-  - Português:
-      - Início: pt/index.md
-      - Arquitetura: pt/arquitetura.md
-      - Checklist: pt/checklist.md
-      - CLI: pt/cli.md
-      - Ambiente: pt/enviroment.md
-  - Español:
-      - Inicio: es/index.md
-      - Arquitectura: es/arquitectura.md
-      - Checklist: es/checklist.md
-      - CLI: es/cli.md
-      - Entorno: es/enviroment.md
-  - Contribuir: CONTRIBUTING.md
+  - About: index.md
+# site_name: Fleting Docs V2
+# use_directory_urls: true
+# site_url: https://alexyucra.github.io/Fleting/
+# theme:
+#   name: material
+#   logo: img/fleting_logo.png
+#   favicon: img/fleting_logo.png
+#   language: en
+#   features:      
+#     - navigation.sections   
+#     - content.code.copy 
+#     - navigation.indexes    
+# plugins:
+#   - search
+#   - i18n:
+#       languages:
+#         - locale: en
+#           name: English
+#           default: true
+#           build: true
+#         - locale: pt
+#           name: Português
+#           build: true
+#         - locale: es
+#           name: Español
+#           build: true
+
+# nav:
+#   - Home: index.md
+#   - Português:
+#       - Início: pt/index.md
+#       - Arquitetura: pt/arquitetura.md
+#       - Checklist: pt/checklist.md
+#       - CLI: pt/cli.md
+#       - Ambiente: pt/enviroment.md
+#   - Español:
+#       - Inicio: es/index.md
+#       - Arquitectura: es/arquitectura.md
+#       - Checklist: es/checklist.md
+#       - CLI: es/cli.md
+#       - Entorno: es/enviroment.md
+#   - Contribuir: CONTRIBUTING.md
 
