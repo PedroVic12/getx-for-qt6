@@ -1,0 +1,4 @@
+{
+  "app": { "name": "my_template" },
+  "home": { "welcome": "Bem-vindo ao framework Qt6 MVC" }
+}

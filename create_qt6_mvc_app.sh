@@ -1,7 +1,19 @@
 #!/bin/bash
 
-PROJECT_NAME=${1:-"my_qt6_app"}
+#!/bin/bash
+
+# Se o primeiro argumento ($1) estiver vazio, pede o input do usuário
+if [ -z "$1" ]; then
+    read -p "📂 Digite o nome do projeto: " PROJECT_NAME
+else
+    PROJECT_NAME=$1
+fi
+
+# Define um valor padrão caso o usuário apenas dê 'Enter' no input
+PROJECT_NAME=${PROJECT_NAME:-"qt6_app"}
+
 echo "🚀 Iniciando framework PySide6 MVC em: $PROJECT_NAME"
+
 
 mkdir -p $PROJECT_NAME/{assets,core,configs/languages,controllers,models,views/pages,views/layouts,views/components}
 
