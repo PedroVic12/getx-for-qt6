@@ -13,17 +13,21 @@ def handle_run():
         console.print("👉 Execute this command within a Fleting project.", style="suggestion")
         return
 
-    if not shutil.which("flet"):
-        console.print("❌ Flet is not installed in the environment.", style="error")
-        console.print("👉 pip install flet", style="suggestion")
+    # Tenta verificar se o PySide6 está instalado
+    try:
+        import PySide6
+    except ImportError:
+        console.print("❌ PySide6 is not installed in the environment.", style="error")
+        console.print("👉 pip install PySide6", style="suggestion")
         return
 
-    console.print("🚀 Starting Fleting application..\n", style="info")
+    console.print("🚀 Starting Qt6 MVC application..\n", style="info")
 
     try:
+        # Usa sys.executable para garantir que usamos o mesmo interpretador/venv
         subprocess.run(
-            ["flet", "run", str(app_path)],
+            [sys.executable, str(app_path)],
             check=True
         )
     except subprocess.CalledProcessError:
-        console.print("❌ Error running the app with Flet", style="error")
+        console.print("❌ Error running the Qt application.", style="error")
