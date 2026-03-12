@@ -1,0 +1,4 @@
+{
+  "app": { "name": "projeto_pyside6" },
+  "home": { "welcome": "Bem-vindo ao framework Qt6 MVC" }
+}

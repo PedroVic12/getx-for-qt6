@@ -26,6 +26,21 @@ It brings an MVC-inspired architecture with **decoupled layout**, **simple routi
   <img src="docs/img/fleting.gif" width="260" />
 </p>
 
+---
+
+## 💎 Novas Funcionalidades (Qt6 Elite Edition)
+
+O Fleting evoluiu! Agora, além do Flet, o framework oferece um motor de geração de código para **PySide6 (Qt6)** focado em softwares desktop de alta performance:
+
+- **🏗️ Motor MVC Nativo**: CLI configurada para gerar projetos estruturados em Controllers, Models e Views nativas.
+- **🔄 Stateful & Stateless Views**: Arquitetura de interface inspirada no Flutter (`build`, `set_state`) para máxima produtividade.
+- **☰ Sidebar de Elite**: Barra lateral retrátil e responsiva com sistema de navegação por ícones e labels.
+- **🌓 Dark Mode Pro**: Toggle instantâneo de temas (Sol/Lua) com estilos de alto contraste padronizados.
+- **📝 Checklist Markdown**: Widget inteligente que renderiza listas complexas via Markdown com persistência automática em **SQLite3**.
+- **📂 Link Áncora Inteligente**: Botão integrado na UI que abre a pasta de documentação (`gemini/**`) diretamente no explorador de arquivos do seu SO.
+
+---
+
 ## 🚀 Quick Start
 
 ### 1. Create an isolated virtual environment
@@ -33,19 +48,31 @@ It brings an MVC-inspired architecture with **decoupled layout**, **simple routi
 - [Recommended: environment with poetry](docs/pt/enviroment.md)
 
 
-## 🛠️ CLI
+## 🛠️ CLI (Qt6 Edition)
+
+Para utilizar o novo motor de geração de código para **PySide6**, siga os comandos abaixo:
 
 ```shell
-pip install flet
-pip install fleting
+# Instale as dependências necessárias
+pip install PySide6 rich
 
-fleting init
-fleting run
+# Inicialize um novo projeto Elite
+python3 -m fleting.cli.cli init meu_projeto
 
-# for development
-fleting create page home
-flet run fleting/app.py
+# Entre na pasta e execute
+cd meu_projeto
+python3 main.py
 ```
+
+### ⚠️ Importante: Desenvolvimento Local
+
+Sempre que você estiver utilizando esta versão modificada do framework dentro deste repositório, utilize o comando via módulo Python para garantir que os **Templates Elite** sejam aplicados corretamente:
+
+> **Comando Recomendado:** `python3 -m fleting.cli.cli <comando>`
+
+Isso evita que o sistema utilize uma versão antiga do `fleting` instalada globalmente no seu ambiente.
+
+---
 
 ## 📚 Documentation
 

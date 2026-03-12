@@ -1,0 +1,17 @@
+{
+  "app": {
+    "name": "My Project Qt6"
+  },
+  "menu": {
+    "home": "Inicio",
+    "settings": "Configuración",
+    "help": "Ayuda"
+  },
+  "home": {
+    "title": "Bienvenido a My Project Qt6"
+  },
+  "settings": {
+    "title": "Configuración",
+    "language": "Idioma"
+  }
+}
