@@ -54,10 +54,7 @@ Para utilizar o novo motor de geração de código para **PySide6**, siga os com
 
 ```shell
 # Instale as dependências necessárias
-pip install PySide6 rich flet fleting 
-
-# (Opcional)
-pip install flet-cli flet-desktop-light
+pip install PySide6 rich
 
 # Inicialize um novo projeto Elite
 python3 -m fleting.cli.cli init meu_projeto
@@ -119,4 +116,11 @@ O Fleting foi criado com alguns princípios claros:
 - Reduced boilerplate
 - Convention > Configuration
 
+---
 
+## 📄 License
+
+MIT
+
+## How to contribute
+- [For those who want to contribute to Fleting on GitHub.](CONTRIBUTING.md)
