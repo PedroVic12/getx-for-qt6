@@ -48,10 +48,8 @@ pip install flet-cli flet-desktop-light
 fleting init
 
 fleting run
+```
 
 # for development
 fleting create page home
 flet run fleting/app.py
-```
-
-
