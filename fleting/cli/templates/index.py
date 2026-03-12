@@ -1,151 +1,279 @@
 from pathlib import Path
 import json
-import base64
-
-ICON = "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"
 
 def init_project(project_root: Path, project_name: str = "Qt6App"):
-    """
-    Initializes a PySide6 MVC project.
-    """
     BASE = project_root
 
     def create_file(path, content=""):
         path.parent.mkdir(parents=True, exist_ok=True)
         if not path.exists():
-            path.write_text(content, encoding="utf-8")
+            path.write_text(content.strip(), encoding="utf-8")
 
-    # Estrutura de Pastas
     folders = [
-        "assets",
-        "core",
-        "configs",
-        "controllers",
-        "models",
-        "views/layouts",
-        "views/pages",
-        "views/components",
+        "assets", "core", "configs/languages", "controllers",
+        "models", "views/layouts", "views/pages", "views/components",
+        "data"
     ]
+    for folder in folders: (BASE / folder).mkdir(parents=True, exist_ok=True)
 
-    for folder in folders:
-        (BASE / folder).mkdir(parents=True, exist_ok=True)
-
-    # 1. CORE: base_view.py
-    create_file(BASE / "core/base_view.py", """from PySide6.QtWidgets import QWidget
-
-class BaseView(QWidget):
-    def __init__(self, controller=None, router=None):
-        super().__init__()
-        self.controller = controller
-        self.router = router
+    # --- STYLE ---
+    create_file(BASE / "styles.py", """
+COMMON_STYLES = \"\"\"
+QCheckBox { spacing: 15px; font-size: 18px; padding: 5px; }
+QCheckBox::indicator { width: 30px; height: 30px; border: 2px solid #555; border-radius: 4px; }
+QCheckBox::indicator:checked { background-color: #2196F3; }
+QPushButton#TextButton { background: transparent; border: none; color: #2196F3; text-decoration: underline; font-size: 14px; text-align: left; }
+QPushButton#NavButton { text-align: left; padding: 12px; border: none; background: transparent; font-size: 14px; }
+\"\"\"
+LIGHT_THEME = COMMON_STYLES + \"\"\"
+QMainWindow, QWidget { background-color: #ffffff; color: #000000; }
+QFrame#Sidebar { background-color: #f0f0f0; border-right: 1px solid #cccccc; }
+QPushButton#NavButton { color: #333333; }
+QPushButton#NavButton:hover { background-color: #e0e0e0; }
+\"\"\"
+DARK_THEME = COMMON_STYLES + \"\"\"
+QMainWindow, QWidget { background-color: #000000; color: #ffffff; }
+QFrame#Sidebar { background-color: #1a1a1a; border-right: 1px solid #333333; }
+QPushButton#NavButton { color: #ffffff; }
+QPushButton#NavButton:hover { background-color: #333333; }
+\"\"\"
 """)
 
-    # 2. CORE: router.py
-    create_file(BASE / "core/router.py", """from PySide6.QtWidgets import QMainWindow, QStackedWidget, QVBoxLayout, QWidget
-import importlib
+    # --- CORE ---
+    create_file(BASE / "core/base_view.py", """
+from PySide6.QtWidgets import QWidget, QVBoxLayout
+class StatelessView(QWidget):
+    def __init__(self, router=None, controller=None):
+        super().__init__()
+        self.router, self.controller, self.main_layout = router, controller, QVBoxLayout(self)
+        self.build()
+    def build(self): pass
+class StatefulView(QWidget):
+    def __init__(self, router=None, controller=None):
+        super().__init__()
+        self.router, self.controller, self.state, self.main_layout = router, controller, {}, QVBoxLayout(self)
+        self.build()
+    def set_state(self, **s): self.state.update(s); self.update_ui()
+    def build(self): pass
+    def update_ui(self): pass
+""")
 
+    create_file(BASE / "core/database.py", """
+import sqlite3
+from pathlib import Path
+def get_connection():
+    db_path = Path("data/app.db")
+    db_path.parent.mkdir(parents=True, exist_ok=True)
+    conn = sqlite3.connect(db_path)
+    conn.row_factory = sqlite3.Row
+    return conn
+""")
+
+    create_file(BASE / "core/logger.py", """
+import logging
+def get_logger(name):
+    logger = logging.getLogger(name)
+    if not logger.handlers:
+        logging.basicConfig(level=logging.INFO, format="%(asctime)s | %(name)s | %(message)s")
+    return logger
+""")
+
+    create_file(BASE / "core/i18n.py", """
+class I18n:
+    @classmethod
+    def load(cls, lang): pass
+    @classmethod
+    def t(cls, key): return key
+""")
+
+    create_file(BASE / "core/router.py", """
+from PySide6.QtWidgets import QMainWindow, QStackedWidget, QHBoxLayout, QVBoxLayout, QWidget, QFrame, QPushButton, QLabel
+from PySide6.QtCore import Qt
+import importlib, styles
+from configs.app_config import AppConfig
+from core.logger import get_logger
+logger = get_logger("Router")
 class Router(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Qt6 MVC Framework")
-        self.resize(800, 600)
-        
-        self.stack = QStackedWidget()
-        self.setCentralWidget(self.stack)
+        self.setWindowTitle(AppConfig.APP_NAME)
+        self.resize(AppConfig.DEFAULT_SCREEN["width"], AppConfig.DEFAULT_SCREEN["height"])
+        self.expanded = True
+        self.central_widget = QWidget(); self.setCentralWidget(self.central_widget)
+        self.layout = QHBoxLayout(self.central_widget); self.layout.setContentsMargins(0,0,0,0); self.layout.setSpacing(0)
+        self.sidebar = QFrame(); self.sidebar.setObjectName("Sidebar"); self.sidebar.setFixedWidth(240)
+        self.sidebar_layout = QVBoxLayout(self.sidebar); self.layout.addWidget(self.sidebar)
+        self.stack = QStackedWidget(); self.layout.addWidget(self.stack)
         self.pages = {}
-
-    def navigate(self, route_path):
+        self.init_sidebar()
+        self.apply_theme()
+    def init_sidebar(self):
+        btn_t = QPushButton(" ☰ "); btn_t.setFixedSize(45,45); btn_t.clicked.connect(self.toggle_sidebar)
+        self.sidebar_layout.addWidget(btn_t)
         from configs.routes import ROUTES
-        
-        if route_path in self.pages:
-            self.stack.setCurrentWidget(self.pages[route_path])
-            return
-
-        # Lazy Loading
         for r in ROUTES:
-            if r["path"] == route_path:
-                module = importlib.import_module(r["module"])
-                view_class = getattr(module, r["view_class"])
-                view_instance = view_class(router=self)
-                
-                self.stack.addWidget(view_instance)
-                self.pages[route_path] = view_instance
-                self.stack.setCurrentWidget(view_instance)
-                return
-        
-        print(f"Rota {route_path} não encontrada.")
+            btn = QPushButton(f" {r['label']}"); btn.setObjectName("NavButton"); btn.setFixedHeight(45)
+            btn.clicked.connect(lambda _, p=r["path"]: self.navigate(p))
+            self.sidebar_layout.addWidget(btn)
+        self.sidebar_layout.addStretch(1)
+        self.theme_btn = QPushButton(AppConfig.THEME_ICONS["moon"])
+        self.theme_btn.clicked.connect(self.toggle_theme); self.sidebar_layout.addWidget(self.theme_btn, 0, Qt.AlignCenter)
+    def toggle_sidebar(self):
+        self.expanded = not self.expanded
+        self.sidebar.setFixedWidth(240 if self.expanded else 70)
+    def toggle_theme(self):
+        AppConfig.DARK_MODE = not AppConfig.DARK_MODE
+        self.theme_btn.setText(AppConfig.THEME_ICONS["sun"] if AppConfig.DARK_MODE else AppConfig.THEME_ICONS["moon"])
+        self.apply_theme()
+    def apply_theme(self):
+        self.setStyleSheet(styles.DARK_THEME if AppConfig.DARK_MODE else styles.LIGHT_THEME)
+    def navigate(self, path):
+        from configs.routes import ROUTES
+        if path in self.pages: self.stack.setCurrentWidget(self.pages[path]); return
+        for r in ROUTES:
+            if r["path"] == path:
+                mod = importlib.import_module(r["module"])
+                v = getattr(mod, r["view_class"])(router=self)
+                self.stack.addWidget(v); self.pages[path] = v; self.stack.setCurrentWidget(v)
 """)
 
-    # 3. CONFIGS: routes.py
-    create_file(BASE / "configs/routes.py", """ROUTES = [
-    {
-        "path": "/",
-        "view_class": "HomeView",
-        "module": "views.pages.home_view",
-        "label": "Home",
-    },
+    # --- CONFIGS ---
+    create_file(BASE / "configs/app_config.py", """
+class AppConfig:
+    APP_NAME = \"PVRV Elite App\"
+    DEFAULT_SCREEN = {"width": 1100, "height": 850}
+    DARK_MODE = False
+    THEME_ICONS = {"sun": "☀️", "moon": "🌙"}
+""")
+    create_file(BASE / "configs/routes.py", """
+ROUTES = [
+    {"path": "/", "view_class": "HomeView", "module": "views.pages.home_view", "label": "Home"},
+    {"path": "/pdf", "view_class": "Pdf_extractorView", "module": "views.pages.pdf_extractor_view", "label": "PDF Extractor"},
+    {"path": "/settings", "view_class": "SettingsView", "module": "views.pages.settings_view", "label": "Settings"},
+    {"path": "/help", "view_class": "HelpView", "module": "views.pages.help_view", "label": "Help"}
 ]
 """)
+    create_file(BASE / "runtime_imports.py", """
+from views.pages.home_view import HomeView
+from views.pages.help_view import HelpView
+from views.pages.settings_view import SettingsView
+from views.pages.pdf_extractor_view import Pdf_extractorView
+""")
 
-    # 4. VIEWS: pages/home_view.py
-    create_file(BASE / "views/pages/home_view.py", """from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton
+    # --- COMPONENTS ---
+    create_file(BASE / "views/components/text_button.py", """
+from PySide6.QtWidgets import QPushButton
+from PySide6.QtCore import Qt
+class TextButton(QPushButton):
+    def __init__(self, t, on_click=None, p=None):
+        super().__init__(t, p); self.setObjectName('TextButton'); self.setCursor(Qt.PointingHandCursor)
+        if on_click: self.clicked.connect(on_click)
+""")
+    
+    create_file(BASE / "views/components/checklist_widget.py", """
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QCheckBox, QFrame
+class ChecklistWidget(QFrame):
+    def __init__(self, md="", parent=None, on_toggle=None):
+        super().__init__(parent); self.on_toggle = on_toggle; self.main_layout = QVBoxLayout(self)
+        self.render_markdown(md)
+    def render_markdown(self, text):
+        for i in reversed(range(self.main_layout.count())):
+            if self.main_layout.itemAt(i).widget(): self.main_layout.itemAt(i).widget().setParent(None)
+        for line in text.strip().split("\\n"):
+            c = line.strip()
+            if not c: continue
+            if c.startswith("## "):
+                l = QLabel(c.replace("## ", "")); l.setStyleSheet("font-size: 20px; font-weight: bold;"); self.main_layout.addWidget(l)
+            elif c.startswith("- ["):
+                cb = QCheckBox(c[5:].strip()); cb.setChecked("[x]" in c.lower())
+                cb.stateChanged.connect(lambda s, t=cb.text(): self.on_toggle(t, s == 2) if self.on_toggle else None)
+                self.main_layout.addWidget(cb)
+""")
+
+    # --- PAGES ---
+    create_file(BASE / "views/pages/home_view.py", """
+import os, sys, subprocess
+from PySide6.QtWidgets import QLabel, QFrame, QVBoxLayout, QHBoxLayout, QLineEdit, QPushButton, QScrollArea
+from core.base_view import StatefulView
+from views.components.text_button import TextButton
+from views.components.checklist_widget import ChecklistWidget
 from controllers.home_controller import HomeController
-
-class HomeView(QWidget):
-    def __init__(self, router=None):
-        super().__init__()
-        self.router = router
+class HomeView(StatefulView):
+    def build(self):
         self.controller = HomeController()
-        self.init_ui()
-
-    def init_ui(self):
-        layout = QVBoxLayout(self)
-        label = QLabel("Bem-vindo ao seu novo App Qt6 MVC!")
-        label.setStyleSheet("font-size: 20px; font-weight: bold;")
-        layout.addWidget(label)
-        
-        btn = QPushButton("Ir para Configurações (Exemplo)")
-        layout.addWidget(btn)
+        banner = QFrame(); banner.setStyleSheet("background: #E3F2FD; border: 1px solid #2196F3; border-radius: 5px;")
+        layout = QVBoxLayout(banner); layout.addWidget(QLabel("🚀 <b>Pronto para começar?</b>"))
+        btn = TextButton("@getx-for-qt6/gemini/** (Abrir Guia)", on_click=self.open_docs)
+        layout.addWidget(btn); self.main_layout.addWidget(banner)
+        self.main_layout.addWidget(QLabel("<h1>🏠 Dashboard</h1>"))
+        md = self.controller.load_tasks_from_db()
+        self.checklist = ChecklistWidget(md, on_toggle=self.controller.update_task_status)
+        scroll = QScrollArea(); scroll.setWidgetResizable(True); scroll.setWidget(self.checklist)
+        self.main_layout.addWidget(scroll)
+    def open_docs(self):
+        path = os.path.abspath(os.path.join(os.getcwd(), "..", "gemini"))
+        if sys.platform == 'win32': os.startfile(path)
+        else: subprocess.Popen(['xdg-open', path])
 """)
 
-    # 5. CONTROLLERS: home_controller.py
-    create_file(BASE / "controllers/home_controller.py", """from PySide6.QtCore import QObject
-
-class HomeController(QObject):
-    def __init__(self):
-        super().__init__()
-
-    def get_title(self):
-        return "Home Page"
+    create_file(BASE / "views/pages/help_view.py", """
+from PySide6.QtWidgets import QLabel
+from core.base_view import StatelessView
+class HelpView(StatelessView):
+    def build(self): self.main_layout.addWidget(QLabel('📚 Central de Ajuda'))
 """)
 
-    # 6. MODELS: home_model.py
-    create_file(BASE / "models/home_model.py", """class HomeModel:
-    def __init__(self):
-        self.data = {}
+    create_file(BASE / "views/pages/settings_view.py", """
+from PySide6.QtWidgets import QLabel
+from core.base_view import StatelessView
+class SettingsView(StatelessView):
+    def build(self): self.main_layout.addWidget(QLabel('⚙️ Configurações'))
 """)
 
-    # 7. main.py
-    create_file(BASE / "main.py", """import sys
+    create_file(BASE / "views/pages/pdf_extractor_view.py", """
+from PySide6.QtWidgets import QLabel
+from core.base_view import StatelessView
+class Pdf_extractorView(StatelessView):
+    def build(self): self.main_layout.addWidget(QLabel('📄 PDF Extractor'))
+""")
+
+    # --- CONTROLLER ---
+    create_file(BASE / "controllers/home_controller.py", """
+from core.database import get_connection
+class HomeController:
+    def load_tasks_from_db(self):
+        conn = get_connection(); cursor = conn.cursor()
+        cursor.execute("CREATE TABLE IF NOT EXISTS tasks (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT UNIQUE, completed INTEGER)")
+        cursor.execute("SELECT title, completed FROM tasks")
+        rows = cursor.fetchall()
+        if not rows:
+            tasks = ["Configurar Qt6", "Sidebar Responsiva", "Dark Mode Fix"]
+            for t in tasks: cursor.execute("INSERT OR IGNORE INTO tasks (title, completed) VALUES (?, 0)", (t,))
+            conn.commit(); cursor.execute("SELECT title, completed FROM tasks"); rows = cursor.fetchall()
+        md = "## 📋 Tarefas Persistentes\\n"
+        for r in rows: md += f"- [{'x' if r['completed'] else ' '}] {r['title']}\\n"
+        return md
+    def update_task_status(self, title, completed):
+        conn = get_connection(); cursor = conn.cursor()
+        cursor.execute("UPDATE tasks SET completed = ? WHERE title = ?", (1 if completed else 0, title))
+        conn.commit()
+""")
+
+    # --- ENTRY ---
+    create_file(BASE / "main.py", """
+import sys
 from PySide6.QtWidgets import QApplication
 from core.router import Router
-
+from core.logger import get_logger
 def main():
     app = QApplication(sys.argv)
-    
-    # Estilo Global (Opcional)
-    # with open("assets/style.qss", "r") as f:
-    #     app.setStyleSheet(f.read())
-    
     router = Router()
     router.navigate("/")
     router.show()
-    
+    get_logger("App").info("Projeto Elite Iniciado")
     sys.exit(app.exec())
-
-if __name__ == "__main__":
-    main()
+if __name__ == "__main__": main()
 """)
 
-    # 8. .fleting flag
-    (BASE / ".fleting").write_text("fleting-qt6-project", encoding="utf-8")
+    (BASE / ".fleting").write_text("fleting-qt6-v3-elite-final", encoding="utf-8")
+    print(f"✅ Template Premium V3 ELITE (Imports & Files Fix) iniciado com sucesso!")

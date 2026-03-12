@@ -2,6 +2,7 @@ from pathlib import Path
 import shutil
 import stat
 import sys
+import os
 from fleting.cli.templates.index import init_project
 from fleting.cli.console.console import console
 
