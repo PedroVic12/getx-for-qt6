@@ -55,14 +55,18 @@ def create_controller(name: str):
     class_name = f"{to_pascal_case(name)}Controller"
     model_class = f"{to_pascal_case(name)}Model"
 
-    content = f'''from models.{name}_model import {model_class}
+    content = f'''from PySide6.QtCore import QObject, Signal
+from models.{name}_model import {model_class}
 
-class {class_name}:
+class {class_name}(QObject):
     """
     Controller for {name} page
     """
+    # Exemplo de Signal para atualizar a View
+    data_updated = Signal(object)
 
     def __init__(self, model=None):
+        super().__init__()
         self.model = model or {model_class}
 
     def get_title(self):
@@ -84,27 +88,19 @@ def create_view(name: str):
 
     class_name = f"{name.capitalize()}View"
 
-    content = f"""import flet as ft
-from views.layouts.main_layout import MainLayout
+    content = f"""from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel
 
-class {class_name}:
-    def __init__(self, page, router):
-        self.page = page
+class {class_name}(QWidget):
+    def __init__(self, controller=None, router=None):
+        super().__init__()
+        self.controller = controller
         self.router = router
+        self.init_ui()
 
-    def render(self):
-        content = ft.Column(
-            controls=[
-                ft.Text("{name.capitalize()}", size=24),
-            ],
-            spacing=16,
-        )
-
-        return MainLayout(
-            page=self.page,
-            content=content,
-            router=self.router,
-        )
+    def init_ui(self):
+        layout = QVBoxLayout(self)
+        self.label = QLabel("{name.capitalize()} View")
+        layout.addWidget(self.label)
 """
 
     path.write_text(content, encoding="utf-8")
@@ -151,17 +147,15 @@ def register_route(name: str):
     routes_file = BASE / "configs" / "routes.py"
 
     if not routes_file.exists():
-        console.print("❌ configs/routes.py não not found", style="error")
+        console.print("❌ configs/routes.py not found", style="error")
         return
 
     route_block = f"""
     {{
         "path": "/{name}",
-        "view": "views.pages.{name}_view.{name.capitalize()}View",
+        "view_class": "{name.capitalize()}View",
+        "module": "views.pages.{name}_view",
         "label": "{name.capitalize()}",
-        "icon": ft.Icons.CHEVRON_RIGHT,
-        "show_in_top": True,
-        "show_in_bottom": False,
     }},
 """
 
@@ -195,31 +189,27 @@ def create_page_view(name: str):
 
     class_name = f"{name.capitalize()}View"
     controller_class = f"{name.capitalize()}Controller"
-    model_class = f"{name.capitalize()}Model"
 
-    content = f"""import flet as ft
-from views.layouts.main_layout import MainLayout
+    content = f"""from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton
 from controllers.{name}_controller import {controller_class}
 
-class {class_name}:
-    def __init__(self, page, router):
-        self.page = page
+class {class_name}(QWidget):
+    def __init__(self, router=None):
+        super().__init__()
         self.router = router
         self.controller = {controller_class}()
+        self.init_ui()
 
-    def render(self):
-        content = ft.Column(
-            controls=[
-                ft.Text(self.controller.get_title(), size=24),
-            ],
-            spacing=16,
-        )
+    def init_ui(self):
+        self.layout = QVBoxLayout(self)
+        self.title_label = QLabel(self.controller.get_title())
+        self.title_label.setStyleSheet("font-size: 24px; font-weight: bold;")
+        self.layout.addWidget(self.title_label)
 
-        return MainLayout(
-            page=self.page,
-            content=content,
-            router=self.router,
-        )
+        # Exemplo de interação
+        self.btn = QPushButton("Clique aqui")
+        self.btn.clicked.connect(lambda: print("Botão da página {name} clicado!"))
+        self.layout.addWidget(self.btn)
 """
     path.write_text(content, encoding="utf-8")
     console.print(f"Page created successfully: {name}", style="success")
