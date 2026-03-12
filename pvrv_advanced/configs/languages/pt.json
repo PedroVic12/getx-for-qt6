@@ -1,0 +1,4 @@
+{
+  "app": { "name": "pvrv_advanced" },
+  "home": { "welcome": "Bem-vindo ao framework Qt6 MVC" }
+}
