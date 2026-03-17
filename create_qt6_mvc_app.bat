@@ -9,6 +9,13 @@ if "%~1"=="" (
 
 if "%PROJECT_NAME%"=="" set PROJECT_NAME=qt6_app
 
+:: Normalização rudimentar para Batch (substitui traço por underline)
+set "PROJECT_NAME_CLEAN=%PROJECT_NAME:-=_%"
+
+:: Para a classe, usamos o nome limpo (Batch não tem capitalize nativo fácil, então usamos o nome limpo + View)
+set "VIEW_CLASS_NAME=%PROJECT_NAME_CLEAN%View"
+set "VIEW_FILE_NAME=%PROJECT_NAME_CLEAN%_view"
+
 echo 🚀 Iniciando framework PySide6 MVC (Elite Edition) em: %PROJECT_NAME%
 
 mkdir %PROJECT_NAME%
@@ -180,12 +187,12 @@ echo                     view_instance = view_class(router=self^)
 echo                     self.stack.addWidget(view_instance^); self.pages[route_path] = view_instance^; self.stack.setCurrentWidget(view_instance^)
 echo                     return
 echo                 except Exception as e: logger.error(f"Erro ao carregar rota {route_path}: {e}"^)
-) > %PROJECT_NAME%\coreouter.py
+) > %PROJECT_NAME%\core\router.py
 
 :: 7. CONFIGS: app_config.py
 (
 echo class AppConfig:
-echo     APP_NAME = "PVRV Advanced Desktop"
+echo     APP_NAME = "%PROJECT_NAME%"
 echo     DEFAULT_SCREEN = {"width": 1100, "height": 850}
 echo     DARK_MODE = False
 echo     THEME_ICONS = {"sun": "☀️", "moon": "🌙"}
@@ -195,19 +202,19 @@ echo     THEME_ICONS = {"sun": "☀️", "moon": "🌙"}
 (
 echo ROUTES = [
 echo     { "path": "/", "view_class": "HomeView", "module": "views.pages.home_view", "label": "Home" },
-echo     { "path": "/pdf_extractor", "view_class": "Pdf_extractorView", "module": "views.pages.pdf_extractor_view", "label": "PDF Extractor" },
+echo     { "path": "/app_view", "view_class": "%VIEW_CLASS_NAME%", "module": "views.pages.%VIEW_FILE_NAME%", "label": "Main View" },
 echo     { "path": "/settings", "view_class": "SettingsView", "module": "views.pages.settings_view", "label": "Configurações" },
 echo     { "path": "/help", "view_class": "HelpView", "module": "views.pages.help_view", "label": "Ajuda" },
 echo ]
-) > %PROJECT_NAME%\configsoutes.py
+) > %PROJECT_NAME%\configs\routes.py
 
 :: 9. runtime_imports.py
 (
 echo from views.pages.home_view import HomeView
 echo from views.pages.help_view import HelpView
 echo from views.pages.settings_view import SettingsView
-echo from views.pages.pdf_extractor_view import Pdf_extractorView
-) > %PROJECT_NAME%untime_imports.py
+echo from views.pages.%VIEW_FILE_NAME% import %VIEW_CLASS_NAME%
+) > %PROJECT_NAME%\runtime_imports.py
 
 :: 10. main.py
 (
@@ -225,7 +232,7 @@ echo         from core.router import Router
 echo         router = Router(^)
 echo         router.navigate("/"^)
 echo         router.show(^)
-echo         logger.info("Aplicação Desktop PVRV iniciada com sucesso"^)
+echo         logger.info("Aplicação Desktop iniciada com sucesso"^)
 echo         sys.exit(app.exec(^)^)
 echo     except Exception as e: print(f"Erro Crítico no Boot: {e}"^)
 echo if __name__ == "__main__": main(^)
@@ -240,7 +247,7 @@ echo     def __init__(self, text, on_click=None, parent=None^):
 echo         super(TextButton, self^).__init__(text, parent^)
 echo         self.setObjectName("TextButton"^); self.setCursor(Qt.PointingHandCursor^)
 echo         if on_click: self.clicked.connect(on_click^)
-) > %PROJECT_NAME%\views\components	ext_button.py
+) > %PROJECT_NAME%\views\components\text_button.py
 
 :: 12. views/components/checklist_widget.py
 (
@@ -253,8 +260,7 @@ echo     def render_markdown(self, text^):
 echo         for i in reversed(range(self.main_layout.count(^)^)^):
 echo             item = self.main_layout.itemAt(i^)
 echo             if item.widget(^): item.widget(^).setParent(None^)
-echo         lines = text.strip(^).split("
-"^)
+echo         lines = text.strip(^).split("\n"^)
 echo         for line in lines:
 echo             content = line.strip(^)
 echo             if not content: continue
@@ -282,15 +288,13 @@ echo         rows = cursor.fetchall(^)
 echo         if not rows:
 echo             self.seed_initial_tasks(^)
 echo             cursor.execute("SELECT title, completed FROM tasks"^); rows = cursor.fetchall(^)
-echo         md = "## 📋 Minhas Tarefas (DB Persistente)
-"
-echo         for row in rows: md += f"- [{'x' if row['completed'] == 1 else ' '}] {row['title']}
-"
+echo         md = "## 📋 Minhas Tarefas (DB Persistente)\n"
+echo         for row in rows: md += f"- [{'x' if row['completed'] == 1 else ' '}] {row['title']}\n"
 echo         return md
 echo     def update_task_status(self, title, completed^):
 echo         conn = get_connection(^); cursor = conn.cursor(^); cursor.execute("UPDATE tasks SET completed = ? WHERE title = ?", (1 if completed else 0, title^)^); conn.commit(^)
 echo     def seed_initial_tasks(self^):
-echo         tasks = ["Configurar PySide6 MVC", "Criar Sidebar Responsiva", "Implementar Loader Palkia", "Finalizar Dark Mode Fix"]
+echo         tasks = ["Configurar PySide6 MVC", "Criar Sidebar Responsiva", "Finalizar Dark Mode Fix"]
 echo conn = get_connection(^); cursor = conn.cursor(^)
 echo for t in tasks: cursor.execute("INSERT OR IGNORE INTO tasks (title, completed) VALUES (?, 0)", (t,^)^)
 echo conn.commit(^)
@@ -309,8 +313,8 @@ echo class HomeView(StatefulView^):
 echo     def __init__(self, router=None^): super(HomeView, self^).__init__(router=router, controller=HomeController(^)^)
 echo     def build(self^):
 echo         doc_frame = QFrame(^); doc_frame.setStyleSheet("background-color: #E3F2FD; border-radius: 5px; border: 1px solid #2196F3;"^); doc_layout = QVBoxLayout(doc_frame^)
-echo         doc_layout.addWidget(QLabel("💡 <b>Dica de Elite:</b> Leia a documentação técnica para começar:"^)^)
-echo         self.btn_gemini = TextButton("@getx-for-qt6/gemini/** (Abrir Guia no Explorador)", on_click=self.open_gemini_docs^); doc_layout.addWidget(self.btn_gemini^); self.main_layout.addWidget(doc_frame^)
+echo         doc_layout.addWidget(QLabel("💡 <b>Dica:</b> Comece editando este arquivo."^)^)
+echo         self.btn_gemini = TextButton("@getx-for-qt6/gemini/** (Abrir Guia)", on_click=self.open_gemini_docs^); doc_layout.addWidget(self.btn_gemini^); self.main_layout.addWidget(doc_frame^)
 echo         self.welcome_label = QLabel(I18n.t("home.welcome"^)^); self.welcome_label.setStyleSheet("font-size: 28px; font-weight: bold; margin-top: 10px;"^); self.main_layout.addWidget(self.welcome_label^)
 echo         interaction_layout = QHBoxLayout(^); self.name_input = QLineEdit(^); self.name_input.setPlaceholderText("Seu nome..."^); interaction_layout.addWidget(self.name_input, 3^)
 echo         self.btn_greet = QPushButton("🚀"^); self.btn_greet.setFixedSize(50, 50^); self.btn_greet.clicked.connect(self.on_greet_click^); interaction_layout.addWidget(self.btn_greet^); self.main_layout.addLayout(interaction_layout^)
@@ -331,7 +335,7 @@ echo from PySide6.QtWidgets import QLabel
 echo from core.base_view import StatelessView
 echo class HelpView(StatelessView^):
 echo     def build(self^):
-echo         label = QLabel("📚 Central de Ajuda. Aqui você encontra os guias de uso."^); label.setStyleSheet("font-size: 20px;"^); self.main_layout.addWidget(label^)
+echo         label = QLabel("📚 Central de Ajuda."^); label.setStyleSheet("font-size: 20px;"^); self.main_layout.addWidget(label^)
 ) > %PROJECT_NAME%\views\pages\help_view.py
 
 :: 16. views/pages/settings_view.py
@@ -340,21 +344,21 @@ echo from PySide6.QtWidgets import QLabel
 echo from core.base_view import StatelessView
 echo class SettingsView(StatelessView^):
 echo     def build(self^):
-echo         label = QLabel("⚙️ Configurações do Sistema. Ajuste as preferências do framework."^); label.setStyleSheet("font-size: 20px;"^); self.main_layout.addWidget(label^)
+echo         label = QLabel("⚙️ Configurações do Sistema."^); label.setStyleSheet("font-size: 20px;"^); self.main_layout.addWidget(label^)
 ) > %PROJECT_NAME%\views\pages\settings_view.py
 
-:: 17. views/pages/pdf_extractor_view.py
+:: 17. Dinâmica: views/pages/[PROJECT]_view.py
 (
 echo from PySide6.QtWidgets import QLabel
 echo from core.base_view import StatelessView
-echo class Pdf_extractorView(StatelessView^):
+echo class %VIEW_CLASS_NAME%(StatelessView^):
 echo     def build(self^):
-echo         label = QLabel("📄 Extrator de PDF Palkia. ETL de PDFs integrada."^); label.setStyleSheet("font-size: 20px;"^); self.main_layout.addWidget(label^)
-) > %PROJECT_NAME%\views\pages\pdf_extractor_view.py
+echo         label = QLabel("📄 View Principal do projeto: %PROJECT_NAME%"^); label.setStyleSheet("font-size: 20px;"^); self.main_layout.addWidget(label^)
+) > %PROJECT_NAME%\views\pages\%VIEW_FILE_NAME%.py
 
 :: 18. configs/languages/pt.json
 (
-echo {"home": {"welcome": "Painel de Controle PVRV"}}
+echo {"home": {"welcome": "Painel de Controle %PROJECT_NAME%"}}
 ) > %PROJECT_NAME%\configs\languages\pt.json
 
 :: 19. .fleting

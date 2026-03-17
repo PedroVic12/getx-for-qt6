@@ -10,6 +10,12 @@ fi
 # Define um valor padrão caso o usuário apenas dê 'Enter' no input
 PROJECT_NAME=${PROJECT_NAME:-"qt6_app"}
 
+# Normalização de nomes
+PROJECT_NAME_CLEAN=$(echo "$PROJECT_NAME" | tr '-' '_')
+# Capitaliza a primeira letra para a classe
+VIEW_CLASS_NAME="$(echo ${PROJECT_NAME_CLEAN} | sed 's/^\(.\)/\U\1/')View"
+VIEW_FILE_NAME="${PROJECT_NAME_CLEAN}_view"
+
 echo "🚀 Iniciando framework PySide6 MVC (Elite Edition) em: $PROJECT_NAME"
 
 mkdir -p $PROJECT_NAME/{assets,core,configs/languages,controllers,models,views/pages,views/layouts,views/components,data,bin}
@@ -174,7 +180,7 @@ EOF
 # 7. CONFIGS: app_config.py
 cat <<EOF > $PROJECT_NAME/configs/app_config.py
 class AppConfig:
-    APP_NAME = "PVRV Advanced Desktop"
+    APP_NAME = "$PROJECT_NAME"
     DEFAULT_SCREEN = {"width": 1100, "height": 850}
     DARK_MODE = False
     THEME_ICONS = {"sun": "☀️", "moon": "🌙"}
@@ -184,7 +190,7 @@ EOF
 cat <<EOF > $PROJECT_NAME/configs/routes.py
 ROUTES = [
     { "path": "/", "view_class": "HomeView", "module": "views.pages.home_view", "label": "Home" },
-    { "path": "/pdf_extractor", "view_class": "Pdf_extractorView", "module": "views.pages.pdf_extractor_view", "label": "PDF Extractor" },
+    { "path": "/app_view", "view_class": "$VIEW_CLASS_NAME", "module": "views.pages.$VIEW_FILE_NAME", "label": "Main View" },
     { "path": "/settings", "view_class": "SettingsView", "module": "views.pages.settings_view", "label": "Configurações" },
     { "path": "/help", "view_class": "HelpView", "module": "views.pages.help_view", "label": "Ajuda" },
 ]
@@ -195,7 +201,7 @@ cat <<EOF > $PROJECT_NAME/runtime_imports.py
 from views.pages.home_view import HomeView
 from views.pages.help_view import HelpView
 from views.pages.settings_view import SettingsView
-from views.pages.pdf_extractor_view import Pdf_extractorView
+from views.pages.$VIEW_FILE_NAME import $VIEW_CLASS_NAME
 EOF
 
 # 10. main.py
@@ -214,7 +220,7 @@ def main():
         router = Router()
         router.navigate("/")
         router.show()
-        logger.info("Aplicação Desktop PVRV iniciada com sucesso")
+        logger.info("Aplicação Desktop iniciada com sucesso")
         sys.exit(app.exec())
     except Exception as e: print(f"Erro Crítico no Boot: {e}")
 if __name__ == "__main__": main()
@@ -276,7 +282,7 @@ class HomeController(QObject):
     def update_task_status(self, title, completed):
         conn = get_connection(); cursor = conn.cursor(); cursor.execute("UPDATE tasks SET completed = ? WHERE title = ?", (1 if completed else 0, title)); conn.commit()
     def seed_initial_tasks(self):
-        tasks = ["Configurar PySide6 MVC", "Criar Sidebar Responsiva", "Implementar Loader Palkia", "Finalizar Dark Mode Fix"]
+        tasks = ["Configurar PySide6 MVC", "Criar Sidebar Responsiva", "Finalizar Dark Mode Fix"]
         conn = get_connection(); cursor = conn.cursor()
         for t in tasks: cursor.execute("INSERT OR IGNORE INTO tasks (title, completed) VALUES (?, 0)", (t,))
         conn.commit()
@@ -295,8 +301,8 @@ class HomeView(StatefulView):
     def __init__(self, router=None): super().__init__(router=router, controller=HomeController())
     def build(self):
         doc_frame = QFrame(); doc_frame.setStyleSheet("background-color: #E3F2FD; border-radius: 5px; border: 1px solid #2196F3;"); doc_layout = QVBoxLayout(doc_frame)
-        doc_layout.addWidget(QLabel("💡 <b>Dica de Elite:</b> Leia a documentação técnica para começar:"))
-        self.btn_gemini = TextButton("@getx-for-qt6/gemini/** (Abrir Guia no Explorador)", on_click=self.open_gemini_docs); doc_layout.addWidget(self.btn_gemini); self.main_layout.addWidget(doc_frame)
+        doc_layout.addWidget(QLabel("💡 <b>Dica:</b> Comece editando este arquivo."))
+        self.btn_gemini = TextButton("@getx-for-qt6/gemini/** (Abrir Guia)", on_click=self.open_gemini_docs); doc_layout.addWidget(self.btn_gemini); self.main_layout.addWidget(doc_frame)
         self.welcome_label = QLabel(I18n.t("home.welcome")); self.welcome_label.setStyleSheet("font-size: 28px; font-weight: bold; margin-top: 10px;"); self.main_layout.addWidget(self.welcome_label)
         interaction_layout = QHBoxLayout(); self.name_input = QLineEdit(); self.name_input.setPlaceholderText("Seu nome..."); interaction_layout.addWidget(self.name_input, 3)
         self.btn_greet = QPushButton("🚀"); self.btn_greet.setFixedSize(50, 50); self.btn_greet.clicked.connect(self.on_greet_click); interaction_layout.addWidget(self.btn_greet); self.main_layout.addLayout(interaction_layout)
@@ -317,7 +323,7 @@ from PySide6.QtWidgets import QLabel
 from core.base_view import StatelessView
 class HelpView(StatelessView):
     def build(self):
-        label = QLabel("📚 Central de Ajuda. Aqui você encontra os guias de uso."); label.setStyleSheet("font-size: 20px;"); self.main_layout.addWidget(label)
+        label = QLabel("📚 Central de Ajuda."); label.setStyleSheet("font-size: 20px;"); self.main_layout.addWidget(label)
 EOF
 
 # 16. views/pages/settings_view.py
@@ -326,21 +332,21 @@ from PySide6.QtWidgets import QLabel
 from core.base_view import StatelessView
 class SettingsView(StatelessView):
     def build(self):
-        label = QLabel("⚙️ Configurações do Sistema. Ajuste as preferências do framework."); label.setStyleSheet("font-size: 20px;"); self.main_layout.addWidget(label)
+        label = QLabel("⚙️ Configurações do Sistema."); label.setStyleSheet("font-size: 20px;"); self.main_layout.addWidget(label)
 EOF
 
-# 17. views/pages/pdf_extractor_view.py
-cat <<EOF > $PROJECT_NAME/views/pages/pdf_extractor_view.py
+# 17. Dinâmica: views/pages/[PROJECT]_view.py
+cat <<EOF > $PROJECT_NAME/views/pages/$VIEW_FILE_NAME.py
 from PySide6.QtWidgets import QLabel
 from core.base_view import StatelessView
-class Pdf_extractorView(StatelessView):
+class $VIEW_CLASS_NAME(StatelessView):
     def build(self):
-        label = QLabel("📄 Extrator de PDF Palkia. ETL de PDFs integrada."); label.setStyleSheet("font-size: 20px;"); self.main_layout.addWidget(label)
+        label = QLabel("📄 View Principal do projeto: $PROJECT_NAME"); label.setStyleSheet("font-size: 20px;"); self.main_layout.addWidget(label)
 EOF
 
 # 18. configs/languages/pt.json
 cat <<EOF > $PROJECT_NAME/configs/languages/pt.json
-{"home": {"welcome": "Painel de Controle PVRV"}}
+{"home": {"welcome": "Painel de Controle $PROJECT_NAME"}}
 EOF
 
 # 19. .fleting
