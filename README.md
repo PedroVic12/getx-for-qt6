@@ -41,7 +41,28 @@ O Fleting evoluiu! Agora, além do Flet, o framework oferece um motor de geraç�
 
 ---
 
-## 🚀 Quick Start
+## 🚀 Quick Start (Geração de Projetos Multi-Template)
+
+Para gerar rapidamente diferentes estruturas de projetos Qt6 (Python/C++ com Widgets, Qt Quick ou Designer), utilize o script interativo de inicialização:
+
+### Linux/macOS:
+```bash
+./create_qt6_mvc_app.sh <nome_do_projeto> [opcao]
+```
+
+### Windows:
+```cmd
+create_qt6_mvc_app.bat <nome_do_projeto> [opcao]
+```
+
+**Opções de Templates disponíveis:**
+1. **PySide6 MVC (Widgets):** O modelo padrão com estrutura de arquivos organizada em MVC, Sidebar interativa e persistência SQLite.
+2. **PySide6 Qt Quick (QML):** Projeto Python usando QML para interfaces dinâmicas e fluidas com propriedades reativas.
+3. **PySide6 Qt Designer (.ui):** Projeto Python carregando layouts `.ui` de forma dinâmica.
+4. **C++ Qt Quick (QML + CMake):** Projeto C++ compilado com CMake e interface QML.
+5. **C++ Qt Widgets (.ui + CMake):** Projeto C++ Widgets tradicional compilando arquivos `.ui` nativamente.
+
+---
 
 ### 1. Create an isolated virtual environment
 
