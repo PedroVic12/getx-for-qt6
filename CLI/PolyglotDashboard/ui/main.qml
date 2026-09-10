@@ -7,15 +7,15 @@ import "components"
 ApplicationWindow {
     id: window
     visible: true
-    width: 900
-    height: 680
+    width: 920
+    height: 700
     title: "Dashboard Poliglota & Toolbox KDE (MVC QML)"
     color: "#11111b"
 
     // --- MENU LATERAL RESPONSIVO (DRAWER) ---
     Drawer {
         id: drawer
-        width: Math.min(window.width * 0.75, 280)
+        width: Math.min(window.width * 0.75, 290)
         height: window.height
 
         background: Rectangle {
@@ -27,7 +27,7 @@ ApplicationWindow {
         ColumnLayout {
             anchors.fill: parent
             anchors.margins: 18
-            spacing: 12
+            spacing: 10
 
             RowLayout {
                 spacing: 10
@@ -43,7 +43,7 @@ ApplicationWindow {
                 text: "Menu de Navegação MVC"
                 color: "#7f849c"
                 font.pixelSize: 11
-                Layout.bottomMargin: 10
+                Layout.bottomMargin: 5
             }
 
             Rectangle { Layout.fillWidth: true; height: 1; color: "#313244" }
@@ -80,6 +80,18 @@ ApplicationWindow {
                 onClicked: {
                     stackLayout.currentIndex = 2
                     headerTitle.text = "Rotina Diária Anti-Kanban"
+                    drawer.close()
+                }
+            }
+
+            ModernButton {
+                text: "📖 Guia POO & Matemática"
+                bgCor: stackLayout.currentIndex === 3 ? "#1e66f5" : "#1e1e2e"
+                textoCor: "#cdd6f4"
+                Layout.fillWidth: true
+                onClicked: {
+                    stackLayout.currentIndex = 3
+                    headerTitle.text = "Guia POO & Matemática Aplicada"
                     drawer.close()
                 }
             }
@@ -146,6 +158,7 @@ ApplicationWindow {
             PolyglotView {}
             CurriculoView {}
             RotinaDiariaView {}
+            GuiaPOOView {}
         }
     }
 

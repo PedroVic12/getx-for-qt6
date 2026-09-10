@@ -60,7 +60,7 @@ ScrollView {
                 }
 
                 Repeater {
-                    model: appController.get_postit_items()
+                    model: appController ? appController.get_postit_items() : []
 
                     Rectangle {
                         Layout.fillWidth: true
@@ -116,7 +116,7 @@ ScrollView {
 
                 Text {
                     id: txtPomodoro
-                    text: appController.get_pomodoros_count() + " / 6 Meta"
+                    text: appController ? appController.get_pomodoros_count() + " / 6 Meta" : "0 / 6 Meta"
                     color: "#a6e3a1"
                     font.pixelSize: 16
                     font.bold: true

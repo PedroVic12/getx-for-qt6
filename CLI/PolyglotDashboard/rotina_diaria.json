@@ -4,17 +4,17 @@
     {
       "id": 1,
       "titulo": "📚 UFF: Revisão de Análise de Circuitos & EDOs",
-      "concluido": true
+      "concluido": false
     },
     {
       "id": 2,
       "titulo": "🏋️ Saúde: Treino de Força & 2L de Água",
-      "concluido": true
+      "concluido": false
     },
     {
       "id": 3,
       "titulo": "💻 Projeto: Concluir Dashboard QML Poliglota MVC",
-      "concluido": true
+      "concluido": false
     }
   ],
   "pomodoros_hoje": 10,

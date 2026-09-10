@@ -1,0 +1,50 @@
+[
+  {
+    "id": 1,
+    "modulo": "Módulo 1",
+    "titulo": "Variáveis, Tipos e Controle de Fluxo (C++, Python, Julia, Lua, C)",
+    "concluido": false
+  },
+  {
+    "id": 2,
+    "modulo": "Módulo 2",
+    "titulo": "Funções, Lambdas e Multiple Dispatch (Julia vs C++/Python)",
+    "concluido": false
+  },
+  {
+    "id": 3,
+    "modulo": "Módulo 3",
+    "titulo": "Classes, Structs e Encapsulamento (C++, Python, Julia, Lua)",
+    "concluido": false
+  },
+  {
+    "id": 4,
+    "modulo": "Módulo 4",
+    "titulo": "Herança, Polimorfismo e Interfaces/Traits",
+    "concluido": false
+  },
+  {
+    "id": 5,
+    "modulo": "Módulo 5",
+    "titulo": "Integração QML + Python (QObject, @Slot, Signal, Data-Binding)",
+    "concluido": false
+  },
+  {
+    "id": 6,
+    "modulo": "Módulo 6",
+    "titulo": "Matemática Aplicada em Python (Newton-Raphson & Matrizes)",
+    "concluido": false
+  },
+  {
+    "id": 7,
+    "modulo": "Módulo 7",
+    "titulo": "Matemática Aplicada em Julia (Sistemas Lineares Ax=b & Integração)",
+    "concluido": false
+  },
+  {
+    "id": 8,
+    "modulo": "Módulo 8",
+    "titulo": "Scripts Utilitários em Lua para a Rotina Diária",
+    "concluido": false
+  }
+]
