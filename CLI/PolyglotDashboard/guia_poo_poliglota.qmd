@@ -1,0 +1,219 @@
+---
+title: "Guia Completo de Programação Orientada a Objetos (POO) Poliglota & QML"
+author: "Pedro Victor Rodrigues Veras (UFF Engenharia Elétrica / ONS)"
+date: "2026-09-10"
+format:
+  html:
+    toc: true
+    theme: dark
+---
+
+# 📖 Guia Poliglota: De Variáveis a POO e Interfaces QML
+
+Este guia foi elaborado para consolidar o aprendizado em **C++, Python, Julia, Lua e C**, integrando a criação de interfaces modernas em **QML (Qt Quick)** com o padrão de arquitetura **MVC**.
+
+---
+
+## 📑 1. Módulo 1: Variáveis, Tipos e Controle de Fluxo
+
+### 🐍 Python (Tipagem Dinâmica e Forte)
+```python
+# Declaracao de variaveis
+tensao: float = 220.0  # Type hint
+corrente: float = 15.5
+nome_carga: str = "Motor Indutivo UFF"
+
+# Controle de Fluxo
+if tensao > 200:
+    print(f"Carga {nome_carga} operando em alta tensão: {tensao}V")
+else:
+    print("Tensão nominal baixa")
+```
+
+### 🚀 C++ (Tipagem Estática e Otimizada)
+```cpp
+#include <iostream>
+#include <string>
+
+int main() {
+    double tensao = 220.0;
+    double corrente = 15.5;
+    std::string nome_carga = "Motor Indutivo UFF";
+
+    if (tensao > 200.0) {
+        std::cout << "Carga " << nome_carga << " em alta tensão: " << tensao << "V\n";
+    }
+    return 0;
+}
+```
+
+### 📈 Julia (Tipagem Dinâmica Opcional com Multiple Dispatch)
+```julia
+tensao::Float64 = 220.0
+corrente = 15.5
+nome_carga = "Motor Indutivo UFF"
+
+if tensao > 200
+    println("Carga $nome_carga em alta tensão: $(tensao)V")
+end
+```
+
+### 🎮 Lua (Leve, Scripting com Tabelas)
+```lua
+local tensao = 220.0
+local corrente = 15.5
+local nome_carga = "Motor Indutivo UFF"
+
+if tensao > 200 then
+    print("Carga " .. nome_carga .. " em alta tensão: " .. tensao .. "V")
+end
+```
+
+---
+
+## 🏛️ 2. Módulo 2: Classes, Structs e Encapsulamento
+
+### 🚀 C++: Orientação a Objetos Nativa
+```cpp
+class Circuito {
+private:
+    double R;
+    double L;
+    double C;
+
+public:
+    Circuito(double r, double l, double c) : R(r), L(l), C(c) {}
+
+    double calcularFrequenciaResonante() const {
+        return 1.0 / std::sqrt(L * C);
+    }
+};
+```
+
+### 🐍 Python: Classes com `@property` e Encapsulamento
+```python
+class Circuito:
+    def __init__(self, r: float, l: float, c: float):
+        self._r = r
+        self._l = l
+        self._c = c
+
+    @property
+    def frequencia_resonante(self) -> float:
+        import math
+        return 1.0 / math.sqrt(self._l * self._c)
+```
+
+### 📈 Julia: Structs Imutáveis/Mutáveis e Multiple Dispatch
+```julia
+struct CircuitoRLC
+    R::Float64
+    L::Float64
+    C::Float64
+end
+
+# Função associada via Multiple Dispatch
+frequencia_resonante(c::CircuitoRLC) = 1.0 / sqrt(c.L * c.C)
+```
+
+### 🎮 Lua: POO usando Metatables
+```lua
+Circuito = {}
+Circuito.__index = Circuito
+
+function Circuito.new(r, l, c)
+    local self = setmetatable({}, Circuito)
+    self.r = r
+    self.l = l
+    self.c = c
+    return self
+end
+
+function Circuito:frequencia_resonante()
+    return 1.0 / math.sqrt(self.l * self.c)
+end
+```
+
+---
+
+## 🎨 3. Módulo 3: Integração de Interfaces QML com Python (PySide6)
+
+No padrão **MVC**, o QML atua como a **View**, enquanto o Python coordena o **Controller** e o **Model**.
+
+### 1. Criando o Controller Python (`QObject`):
+```python
+from PySide6.QtCore import QObject, Slot, Signal
+
+class MathController(QObject):
+    resultadoCalculado = Signal(float)
+
+    @Slot(float, float, result=float)
+    def resolver_resistencia_equivalente(self, r1: float, r2: float) -> float:
+        req = (r1 * r2) / (r1 + r2) if (r1 + r2) > 0 else 0.0
+        self.resultadoCalculado.emit(req)
+        return req
+```
+
+### 2. Registrando o Controller no QML:
+```python
+engine.rootContext().setContextProperty("mathCtrl", MathController())
+```
+
+### 3. Chamando no QML:
+```qml
+Button {
+    text: "Calcular Req"
+    onClicked: {
+        var req = mathCtrl.resolver_resistencia_equivalente(10.0, 20.0)
+        console.log("Req Calculado: " + req)
+    }
+}
+```
+
+---
+
+## 🧮 4. Módulo 4: Matemática Aplicada (Python & Julia)
+
+### 🐍 Python: Método de Newton-Raphson para Raízes de Equações
+```python
+def newton_raphson(f, df, x0, tol=1e-6, max_iter=100):
+    x = x0
+    for i in range(max_iter):
+        fx = f(x)
+        if abs(fx) < tol:
+            return x
+        dfx = df(x)
+        if dfx == 0:
+            break
+        x = x - fx / dfx
+    return x
+```
+
+### 📈 Julia: Resolução de Sistemas Lineares de Potência ($A x = b$)
+```julia
+using LinearAlgebra
+
+# Matriz de Admitância (Ybus) 3x3
+Ybus = [10.0 -5.0 -5.0;
+        -5.0 15.0 -10.0;
+        -5.0 -10.0 15.0]
+
+I_inj = [10.0; 0.0; 0.0]
+
+# Tensão nas Barras V = Ybus \ I_inj
+V_barras = Ybus \ I_inj
+println("Tensões nas barras (V): ", V_barras)
+```
+
+---
+
+## 📝 Checklist de Estudo Integrado
+
+- [x] Declaração de variáveis e controle de fluxo em 5 linguagens
+- [x] Criação de Classes em C++ e Python
+- [x] Multiple Dispatch em Julia vs Métodos Orientados a Objeto
+- [x] POO com Metatables em Lua
+- [x] Conexão QML <-> Python (`QObject`, `@Slot`, `Signal`)
+- [x] Resolução de Sistemas Lineares em Julia
+- [x] Métodos Numéricos em Python
+- [x] Scripts utilitários de produtividade diária em Lua

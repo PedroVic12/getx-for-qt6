@@ -1,0 +1,22 @@
+{
+  "data": "2026-09-10",
+  "post_its": [
+    {
+      "id": 1,
+      "titulo": "📚 UFF: Revisão de Análise de Circuitos & EDOs",
+      "concluido": true
+    },
+    {
+      "id": 2,
+      "titulo": "🏋️ Saúde: Treino de Força & 2L de Água",
+      "concluido": true
+    },
+    {
+      "id": 3,
+      "titulo": "💻 Projeto: Concluir Dashboard QML Poliglota MVC",
+      "concluido": true
+    }
+  ],
+  "pomodoros_hoje": 10,
+  "meta_pomodoros": 6
+}
